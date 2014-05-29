@@ -1,7 +1,7 @@
 require 'inherited_resources'
 
-require 'active_admin/base_controller/authorization'
-require 'active_admin/base_controller/menu'
+require_dependency 'active_admin/base_controller/authorization'
+require_dependency 'active_admin/base_controller/menu'
 
 module ActiveAdmin
   # BaseController for ActiveAdmin.

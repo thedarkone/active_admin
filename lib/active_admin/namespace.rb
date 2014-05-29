@@ -35,6 +35,7 @@ module ActiveAdmin
       @resources = ResourceCollection.new
       register_module unless root?
       build_menu_collection
+      @controller_registry = {}
     end
 
     # Register a resource into this namespace. The preffered method to access this is to
@@ -152,7 +153,31 @@ module ActiveAdmin
       end
     end
 
+    def get_controller(controller_name)
+      fast_path_controller_constantize(controller_name)
+    rescue NameError
+      if entry = @controller_registry[controller_name]
+        parent_name, config = entry
+        eval "class ::#{controller_name} < #{parent_name}; end"
+        controller = fast_path_get_controller(controller_name)
+        controller.active_admin_config = config
+        controller
+      end
+    end
+
     protected
+
+    if defined?(ActiveSupport::Dependencies::Reference)
+      # later Rails versions have a fast auto-loadable const cache (ActiveSupport::Dependencies::Reference)
+      def fast_path_controller_constantize(controller_name)
+        ActiveSupport::Dependencies::Reference.get(controller_name)
+      end
+    else
+      # no luck, just use .constantize
+      def fast_path_controller_constantize(controller_name)
+        controller_name.constantize
+      end
+    end
 
     def build_menu_collection
       @menus = MenuCollection.new
@@ -186,8 +211,7 @@ module ActiveAdmin
 
     # TODO: replace `eval` with `Class.new`
     def register_page_controller(config)
-      eval "class ::#{config.controller_name} < ActiveAdmin::PageController; end"
-      config.controller.active_admin_config = config
+      @controller_registry[config.controller_name] = ['ActiveAdmin::PageController', config]
     end
 
     def unload_resources!
@@ -202,6 +226,7 @@ module ActiveAdmin
           resource.dsl.run_registration_block { @config = nil }
         end
       end
+      @controller_registry.clear
       @resources = ResourceCollection.new
     end
 
@@ -214,8 +239,7 @@ module ActiveAdmin
 
     # TODO replace `eval` with `Class.new`
     def register_resource_controller(config)
-      eval "class ::#{config.controller_name} < ActiveAdmin::ResourceController; end"
-      config.controller.active_admin_config = config
+      @controller_registry[config.controller_name] = ['ActiveAdmin::ResourceController', config]
     end
 
     def parse_registration_block(config, resource_class, &block)

@@ -1,11 +1,11 @@
 require 'inherited_resources'
-require 'active_admin/resource_controller/action_builder'
-require 'active_admin/resource_controller/data_access'
-require 'active_admin/resource_controller/decorators'
-require 'active_admin/resource_controller/scoping'
-require 'active_admin/resource_controller/streaming'
-require 'active_admin/resource_controller/sidebars'
-require 'active_admin/resource_controller/resource_class_methods'
+require_dependency 'active_admin/resource_controller/action_builder'
+require_dependency 'active_admin/resource_controller/data_access'
+require_dependency 'active_admin/resource_controller/decorators'
+require_dependency 'active_admin/resource_controller/scoping'
+require_dependency 'active_admin/resource_controller/streaming'
+require_dependency 'active_admin/resource_controller/sidebars'
+require_dependency 'active_admin/resource_controller/resource_class_methods'
 
 module ActiveAdmin
   # All Resources Controller inherits from this controller.

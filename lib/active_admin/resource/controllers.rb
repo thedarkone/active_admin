@@ -6,12 +6,12 @@ module ActiveAdmin
       # Returns a properly formatted controller name for this
       # config within its namespace
       def controller_name
-        [namespace.module_name, resource_name.plural.camelize + "Controller"].compact.join('::')
+        @controller_name ||= [namespace.module_name, resource_name.plural.camelize + "Controller"].compact.join('::')
       end
 
       # Returns the controller for this config
       def controller
-        @controller ||= controller_name.constantize
+        namespace.get_controller(controller_name)
       end
 
     end

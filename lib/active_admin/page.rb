@@ -61,7 +61,7 @@ module ActiveAdmin
     end
 
     def controller_name
-      [namespace.module_name, camelized_resource_name + "Controller"].compact.join('::')
+      @controller_name ||= [namespace.module_name, camelized_resource_name + "Controller"].compact.join('::')
     end
 
     # Override from `ActiveAdmin::Resource::Controllers`
